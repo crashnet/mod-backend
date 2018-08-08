@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,12 +45,12 @@ public class MediasetController {
 	MediasetController() throws IOException {
 
 		Date timestamp_start = new Date();
-		// RestTemplate rt = new RestTemplate();
-		// String json_string =
-		// rt.getForObject("http://www.video.mediaset.it/programma/progr_archivio.json",
-		// String.class);
+		 RestTemplate rt = new RestTemplate();
+		 String archivio_json =
+		 rt.getForObject("http://www.video.mediaset.it/programma/progr_archivio.json",
+		 String.class);
 
-		String archivio_json = FileUtils.readFileToString(new File("prog_archivio.json"), "UTF-8");
+	//	String archivio_json = FileUtils.readFileToString(new File("prog_archivio.json"), "UTF-8");
 
 		/**
 		 * sanitizzo il json sostituendo per il primo program un oggetto vuoto con un array vuoto 
