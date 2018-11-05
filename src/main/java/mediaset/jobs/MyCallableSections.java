@@ -41,9 +41,6 @@ public class MyCallableSections implements Callable<Map<String, Section>> {
 
 		try {
 			crawl(program_url);
-
-			Element descr = doc.select("div._1bCA7").first();
-			logger.debug("Program description:" + descr.text());
 			
 			Elements secs = doc.select("section.videoMixed");
 
@@ -81,14 +78,14 @@ public class MyCallableSections implements Callable<Map<String, Section>> {
 					}
 
 					s.setVideos(video_array);
-
 					sections.put(s.getTitle(), s);
 
 				}
 			}
 
 			program.setSections(sections);
-		
+			Element descr = doc.select("div._1bCA7").first();
+			logger.debug("Program description:" + descr.text());
 			program.setDescription(descr.text());
 
 		} catch (IOException e2) {
