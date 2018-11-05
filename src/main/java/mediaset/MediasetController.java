@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import org.jsoup.Connection;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -65,13 +64,14 @@ public class MediasetController {
 	}
 
 	@GetMapping(value = "/mediaset/elenco-gruppi")
-	public @ResponseBody List<String> elencoGruppiGET() throws IOException {
+	public @ResponseBody List<Group> elencoGruppiGET() throws IOException {
 		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
 		List<String> groups = new ArrayList<String>();
 		for (Group g : gruppi) {
 			groups.add(g.getIndex());
 		}
-		return groups;
+//		return groups;
+		return gruppi;
 	}
 
 	@PostMapping(value = "/mediaset/elenco-gruppi")
