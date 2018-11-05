@@ -275,12 +275,22 @@ public class MediasetController {
 		return video;
 
 	}
+	
+	@GetMapping(value = "/mediaset/elenco-video")
+	public @ResponseBody List<Video> elencoVideoGET(@RequestBody Input input) throws IOException {
+		logger.debug("Request: " + input);
+		List<Video> video = sessionManagement.getProgrammi().get(input.getProgramId()).getSections()
+				.get(input.getSector()).getVideos();
+		logger.debug("Response: " + video);
+		return video;
+
+	}
 
 	@PostMapping(value = "/mediaset/video")
-	public @ResponseBody Video videoPOST(@RequestBody Input input) throws IOException {
+	public @ResponseBody Video videoPOST(@PathVariable String id) throws IOException {
 
 		String video_url_json = "http://cdnsel01.mediaset.net/GetCdn.aspx?streamid={id}&format=json";
-		video_url_json = video_url_json.replace("{id}", input.getId());
+		video_url_json = video_url_json.replace("{id}", id);
 
 		String json = Jsoup.connect(video_url_json).get().text();
 		logger.debug("video json: " + json);
