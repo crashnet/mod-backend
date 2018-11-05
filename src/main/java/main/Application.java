@@ -18,8 +18,8 @@ public class Application {
 //		Class[] sources = { Application.class, MediasetController.class };
 		SpringApplication.run(Application.class, args);
 		
-//		RestTemplate rt = new RestTemplate();
-//		rt.getForObject("http://localhost:8080/prova", Void.class);
+		RestTemplate rt = new RestTemplate();
+		rt.getForObject("http://localhost:8080/prova", Void.class);
 	}
 	
 	
