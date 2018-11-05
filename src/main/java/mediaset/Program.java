@@ -89,7 +89,7 @@ public class Program {
 
 	// @JsonProperty("thumbnail")
 	public String getThumbnail() {
-		return thumbnail;
+		return thumbnail.replace("http://", "https://");
 	}
 
 	// @JsonProperty("thumbnail")
