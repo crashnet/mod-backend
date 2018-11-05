@@ -6,10 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
-import org.jsoup.Connection;
+import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -19,72 +18,96 @@ import mediaset.Program;
 import mediaset.Section;
 import mediaset.Video;
 
-public class MyCallableSections implements Callable<Map<String,Section>> {
-
+public class MyCallableSections implements Callable<Map<String, Section>> {
 
 	final static Logger logger = Logger.getLogger(MyCallableSections.class);
 
 	private Program program;
+	private String program_url;
+	private Document doc;
+	private Map<String, Section> sections = new HashMap<String, Section>();
 
 	MyCallableSections(Program program) {
 		this.program = program;
 	}
 
 	@Override
-	public Map<String,Section> call()  {
+	public Map<String, Section> call() {
 
-		String path_url = program.getUrl();
-		String program_url = "http://www.video.mediaset.it" + path_url;
-		Map<String, Section> sections = new HashMap<String, Section>();
-		
-		Connection con = Jsoup.connect(program_url);
-		con.timeout(30000);
-		Document doc;
+		program_url = "http://www.video.mediaset.it" + program.getUrl();
+
+		logger.debug("ProgramId: " + program.getId() + " - program_title: " + program.getLabel() + " - program_url: "
+				+ program_url);
+
 		try {
-			doc = con.get();
-		
-		Element container = doc.select("div.page, div.brandpage").first();
-		Elements secs = container.select("section");
+			crawl(program_url);
 
-		
-		for (Element sec : secs) {
-			Element tag_h2 = sec.select("h2.title").first();
+			Elements secs = doc.select("section.videoMixed");
 
-			if (tag_h2 != null) {
-				Elements videos = sec.select("div.clip, div.ic-none");
-				List<Video> video_array = new ArrayList<Video>();
-				Section s = new Section();
-				s.setTitle(tag_h2.text());
-				s.setNumVideo(videos.size());
+			for (Element sec : secs) {
+				Element tag_h2 = sec.select("h2").first();
 
-				for (Element video : videos) {
-					Element tag_a = video.select("a").first();
-					Element tag_img = tag_a.select("img").first();
-					Element tag_p = video.select("p").first();
+				if (checkNull(tag_h2)) {
 
-					Video v = new Video();
-					if (tag_a != null) {
-						v.setId(tag_a.attr("data-vid"));
-						v.setTitle(tag_a.attr("title"));
-						v.setBrand(tag_a.attr("data-brand"));
+					Elements tags_a = sec.select("a");
+
+					List<Video> video_array = new ArrayList<Video>();
+
+					Section s = new Section();
+					s.setTitle(tag_h2.text());
+					s.setNumVideo(tags_a.size());
+
+					for (Element tag_a : tags_a) {
+
+						Video video = new Video();
+						String attr_href = tag_a.attr("href");
+						video.setId((attr_href.split("_").length > 1 ? attr_href.split("_")[1] : ""));
+
+						Element tag_img = tag_a.select("img").first();
+
+						if (checkNull(tag_img)) {
+							video.setThumbnails(tag_img.attr("src"));
+							video.setTitle(tag_img.attr("title"));
+						}
+
+						if (!video.getId().equals("")) {
+							video_array.add(video);
+							logger.debug(video.toString());
+						}
+						
 					}
-					if (tag_img != null)
-						v.setThumbnails(tag_img.attr("data-lazy"));
-					if (tag_p != null)
-						v.setDescription(tag_p.text());
-					video_array.add(v);
+
+					s.setVideos(video_array);
+
+					sections.put(s.getTitle(), s);
+
 				}
-				s.setVideos(video_array);
-				sections.put(s.getTitle(),s);
 			}
+
+			program.setSections(sections);
+
+		} catch (IOException e2) {
+			logger.error("ProgramId: " + program.getId() + " error code: " + e2.getMessage() + " - program_title: "
+					+ program.getLabel() + " - program_url: " + program_url);
 		}
 
-		} catch (IOException e) {
-			
-			logger.error("program: "+ program + "\nmessage: " + e.getMessage());
-		}
-		program.setSections(sections);
 		return sections;
 	}
 
+	private void crawl(String url) throws IOException {
+
+		Response response = Jsoup.connect(url).followRedirects(false).timeout(50000).execute();
+
+		if (response.hasHeader("location"))
+			crawl(response.header("location"));
+		else
+			doc = Jsoup.connect(url).followRedirects(false).timeout(50000).get();
+
+		logger.debug("ProgramId: " + program.getId() + " status code: " + response.statusCode() + " program_title: "
+				+ program.getLabel() + " - url: " + url);
+	}
+
+	private boolean checkNull(Object obj) {
+		return obj != null ? true : false;
+	}
 }

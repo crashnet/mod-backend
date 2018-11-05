@@ -7,11 +7,24 @@ public class Sections {
 	private ArrayList<Section> sections;
 	private String programId;
 	private String label;
-
+	
 	@Override
 	public String toString() {
 		return "Sections [sections=" + sections + ", programId=" + programId + ", label=" + label + "]";
 	}
+
+	public Sections() {
+		super();
+	}
+	
+	public Sections(ArrayList<Section> sections, String programId, String label) {
+		super();
+		this.sections = sections;
+		this.programId = programId;
+		this.label = label;
+	}
+
+
 
 	public String getLabel() {
 		return label;

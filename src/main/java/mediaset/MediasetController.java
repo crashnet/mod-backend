@@ -1,262 +1,289 @@
 package mediaset;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.jsoup.Connection;
+import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import mediaset.jobs.CacheMediasetProgramSectionsThread;
+import configuration.SessionManagement;
 
 @CrossOrigin(origins = "*")
+@Component
 @RestController
 public class MediasetController {
 
-	private Archivio archivio;
-	private Map<String, Program> programmi = new HashMap<String, Program>();
-	Map<String, Sections> lista_sezioni = new HashMap<String, Sections>();
-
 	final static Logger logger = Logger.getLogger(MediasetController.class);
 
-	ObjectMapper mapper = new ObjectMapper();
+	@Autowired
+	private SessionManagement sessionManagement;
 
-	MediasetController() throws IOException {
+//	private Archivio archivio = session.getArchivio();
+//	private Map<String, Program> programmi = session.getProgrammi();
+//	private Map<String, Sections> cache_sezioni = session.getCache_sezioni();
 
-		Date timestamp_start = new Date();
-		 RestTemplate rt = new RestTemplate();
-		 String archivio_json =
-		 rt.getForObject("http://www.video.mediaset.it/programma/progr_archivio.json",
-		 String.class);
+	public MediasetController() {
 
-	//	String archivio_json = FileUtils.readFileToString(new File("prog_archivio.json"), "UTF-8");
-
-		/**
-		 * sanitizzo il json sostituendo per il primo program un oggetto vuoto con un array vuoto 
-		 **/
-		archivio_json = archivio_json.replaceFirst("\\{\\}", "[]");
-		archivio = mapper.readValue(archivio_json, Archivio.class);
-
-		/** popolo la mappa di tutti i programmi **/
-		for (Group group : archivio.getProgrammi().getGroup()) {
-			for (Program program : group.getProgram()) {
-				if(program.getId().equals(""))
-					program.setId(program.getLabel());
-				if(program.getUrl().contains("http"))
-					program.setUrl(program.getUrl().replaceFirst("http://www.video.mediaset.it", ""));
-				programmi.put(program.getId(), program);
-			}
-		}
-
-//		CacheMediasetProgramSectionsThread cst = new CacheMediasetProgramSectionsThread(programmi);
-//		cst.start();
-
-		System.out.println("End Application constructors");
-
-		logger.info("elenco programmi: " + programmi.size());
-
-		Date timestamp_end = new Date();
-		logger.info("tempo inizializzazione server: " + getDateDiff(timestamp_start, timestamp_end, TimeUnit.MILLISECONDS));
 	}
 
-	@RequestMapping(value = "/mediaset/sizesezioni", method = RequestMethod.GET)
+	@GetMapping(value = "/mediaset/sizesezioni")
 	public @ResponseBody int sezioniSizeGET() throws IOException {
-		return lista_sezioni.size();
+		return sessionManagement.getCache_sezioni().size();
 	}
-	
-	
+
 	@RequestMapping(value = "/mediaset/archivio", method = RequestMethod.GET)
 	public @ResponseBody Archivio archivioGET() throws IOException {
-		return archivio;
+		logger.debug("MethodName:" + Thread.currentThread().getStackTrace()[1].getMethodName());
+		return sessionManagement.getArchivio();
 	}
-	
-	@RequestMapping(value = "/mediaset/archivio", method = RequestMethod.POST)
+
+	@PostMapping(value = "/mediaset/archivio")
 	public @ResponseBody Archivio archivioPOST() throws IOException {
-		return archivio;
+		logger.debug("MethodName:" + Thread.currentThread().getStackTrace()[1].getMethodName());
+		return sessionManagement.getArchivio();
 	}
-	
-	@RequestMapping(value = "/mediaset/elenco-gruppi", method = RequestMethod.GET)
+
+	@GetMapping(value = "/mediaset/elenco-gruppi")
 	public @ResponseBody List<String> elencoGruppiGET() throws IOException {
-		List<Group> gruppi = archivio.getProgrammi().getGroup();
+		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
 		List<String> groups = new ArrayList<String>();
-		for(Group g: gruppi) {
+		for (Group g : gruppi) {
 			groups.add(g.getIndex());
 		}
 		return groups;
 	}
-	
-	@RequestMapping(value = "/mediaset/elenco-gruppi", method = RequestMethod.POST)
+
+	@PostMapping(value = "/mediaset/elenco-gruppi")
 	public @ResponseBody List<String> elencoGruppiPOST() throws IOException {
-		List<Group> gruppi = archivio.getProgrammi().getGroup();
+		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
 		List<String> groups = new ArrayList<String>();
-		for(Group g: gruppi) {
+		for (Group g : gruppi) {
 			groups.add(g.getIndex());
 		}
 		return groups;
 	}
-	
-	@RequestMapping(value = "/mediaset/elenco-programmi/{id}", method = RequestMethod.GET)
+
+	@GetMapping(value = "/mediaset/elenco-programmi/{id}")
 	public @ResponseBody List<Program> elencoProgrammiPerGruppoGET(@PathVariable String id) throws IOException {
-		List<Group> gruppi = archivio.getProgrammi().getGroup();
+		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
 
-		for(Group g: gruppi)
-			if(id.equals(g.getIndex()))
+		for (Group g : gruppi)
+			if (id.equals(g.getIndex()))
 				return g.getProgram();
 
 		return null;
 	}
 
-	@RequestMapping(value = "/mediaset/elenco-programmi", method = RequestMethod.POST)
+	@PostMapping(value = "/mediaset/elenco-programmi")
 	public @ResponseBody List<Program> elencoProgrammiPerGruppoPOST(@RequestBody Input input) throws IOException {
-		
-		logger.debug("Request: " +input);
-		List<Group> gruppi = archivio.getProgrammi().getGroup();
-		
-		for(Group g: gruppi)
-			if(input.getId().equals(g.getIndex()))
+
+		logger.debug("Request: " + input);
+		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
+
+		for (Group g : gruppi)
+			if (input.getId().equals(g.getIndex()))
 				return g.getProgram();
 
 		return null;
 	}
-	
-	@RequestMapping(value = "/mediaset/elenco-programmi-full", method = RequestMethod.POST)
+
+	@PostMapping(value = "/mediaset/elenco-programmi-full")
 	public @ResponseBody Collection<Program> elencoProgrammiFullGET() throws IOException {
-		return programmi.values();
-	}
-	
-	@RequestMapping(value = "/mediaset/elenco-programmi-full", method = RequestMethod.GET)
-	public @ResponseBody Collection<Program> elencoProgrammiFullPOST() throws IOException {
-		return programmi.values();
+		return sessionManagement.getProgrammi().values();
 	}
 
-	
-	@RequestMapping(value = "/mediaset/sezioni", method = RequestMethod.POST)
+	@GetMapping(value = "/mediaset/elenco-programmi-full")
+	public @ResponseBody Collection<Program> elencoProgrammiFullPOST() throws IOException {
+		return sessionManagement.getProgrammi().values();
+	}
+
+	@PostMapping(value = "/mediaset/sezioni")
 	public @ResponseBody Sections sezioniPOST(@RequestBody Input input) throws IOException {
 
 		Date timestamp_start = new Date();
 		logger.debug("Request: " + input);
-		String path_url = programmi.get(input.getId()).getUrl();
+		String path_url = sessionManagement.getProgrammi().get(input.getId()).getUrl();
 		logger.debug("path_url: " + path_url);
 		String program_url = "http://www.video.mediaset.it" + path_url;
+		Document doc = crawl(program_url);
 
-		Document doc = Jsoup.connect(program_url).get();
-		Element container = doc.select("div.page, div.brandpage").first();
-		Elements secs = container.select("section");
+		Elements secs = doc.select("section.videoMixed");
 
-		ArrayList<Section> sections = new ArrayList<>();
+		ArrayList<Section> sections = new ArrayList<Section>();
 
 		for (Element sec : secs) {
-			Element tag_h2 = sec.select("h2.title").first();
+			Element tag_h2 = sec.select("h2").first();
 
-			if (tag_h2 != null) {
-				Elements videos = sec.select("div.clip, div.ic-none");
-				Section s = new Section();
-				s.setTitle(tag_h2.text());
-				s.setNumVideo(videos.size());
-				sections.add(s);
+			if (checkNull(tag_h2)) {
+
+				Elements tags_a = sec.select("a");
+
+				List<Video> video_array = new ArrayList<Video>();
+
+				Section section = new Section();
+				section.setTitle(tag_h2.text());
+				section.setNumVideo(tags_a.size());
+
+				for (Element tag_a : tags_a) {
+
+					Video video = new Video();
+					String attr_href = tag_a.attr("href");
+					video.setId((attr_href.split("_").length > 1 ? attr_href.split("_")[1] : ""));
+
+					Element tag_img = tag_a.select("img").first();
+
+					if (checkNull(tag_img)) {
+						video.setThumbnails(tag_img.attr("src"));
+						video.setTitle(tag_img.attr("title"));
+					}
+					if (!video.getId().equals(""))
+						video_array.add(video);
+
+					logger.debug(video.toString());
+				}
+
+				section.setVideos(video_array);
+				sections.add(section);
+
 			}
 		}
 
-		Sections sezioni = new Sections();
-		sezioni.setProgramId(input.getId());
-		sezioni.setSections(sections);
-		sezioni.setLabel(programmi.get(input.getId()).getLabel());
-		
+		Sections pippo = new Sections(sections, input.getId(),
+				sessionManagement.getProgrammi().get(input.getId()).getLabel());
+
 		Date timestamp_end = new Date();
-		logger.debug("Response: " + sezioni.toString());
-		logger.debug("sections time left: " + getDateDiff(timestamp_start, timestamp_end, TimeUnit.MILLISECONDS));
-		return sezioni;
+		logger.debug("Response: " + pippo.toString());
+		logger.debug("sections time left: " + Utils.getDateDiff(timestamp_start, timestamp_end, TimeUnit.MILLISECONDS));
+		return pippo;
 	}
-	
-	@RequestMapping(value = "/mediaset/sezioni/{id}", method = RequestMethod.GET)
+
+	@GetMapping(value = "/mediaset/sezioni/{id}")
 	public @ResponseBody Sections sezioniGET(@PathVariable String id) throws IOException {
 
-		Date timestamp_start = new Date();
 		logger.debug("Request: " + id);
-		String path_url = programmi.get(id).getUrl();
+		String path_url = sessionManagement.getProgrammi().get(id).getUrl();
 		logger.debug("path_url: " + path_url);
 		String program_url = "http://www.video.mediaset.it" + path_url;
 
-		Document doc = Jsoup.connect(program_url).get();
-		Element container = doc.select("div.page, div.brandpage").first();
-		Elements secs = container.select("section");
-
-		ArrayList<Section> sections = new ArrayList<>();
+		Document doc = crawl(program_url);
+		logger.debug("doc: " + doc.textNodes());
+		Elements secs = doc.select("section.videoMixed");
+		logger.debug("secs.size: " + secs.size());
+		ArrayList<Section> sections = new ArrayList<Section>();
 
 		for (Element sec : secs) {
-			Element tag_h2 = sec.select("h2.title").first();
+			Element tag_h2 = sec.select("h2").first();
 
-			if (tag_h2 != null) {
-				Elements videos = sec.select("div.clip, div.ic-none");
-				Section s = new Section();
-				s.setTitle(tag_h2.text());
-				s.setNumVideo(videos.size());
-				sections.add(s);
+			if (checkNull(tag_h2)) {
+
+				Elements tags_a = sec.select("a");
+
+				List<Video> video_array = new ArrayList<Video>();
+
+				Section section = new Section();
+				section.setTitle(tag_h2.text());
+				section.setNumVideo(tags_a.size());
+
+				for (Element tag_a : tags_a) {
+
+					Video video = new Video();
+					String attr_href = tag_a.attr("href");
+					video.setId((attr_href.split("_").length > 1 ? attr_href.split("_")[1] : ""));
+
+					Element tag_img = tag_a.select("img").first();
+
+					if (checkNull(tag_img)) {
+						video.setThumbnails(tag_img.attr("src"));
+						video.setTitle(tag_img.attr("title"));
+					}
+					if (!video.getId().equals(""))
+						video_array.add(video);
+
+					logger.debug(video.toString());
+				}
+
+				section.setVideos(video_array);
+				sections.add(section);
+
 			}
 		}
 
-		Sections sezioni = new Sections();
-		sezioni.setProgramId(id);
-		sezioni.setSections(sections);
-		sezioni.setLabel(programmi.get(id).getLabel());
-		
+		Sections pippo = new Sections(sections, id, sessionManagement.getProgrammi().get(id).getLabel());
 		Date timestamp_end = new Date();
-		logger.debug("Response: " + sezioni.toString());
-		logger.debug("sections time left: " + getDateDiff(timestamp_start, timestamp_end, TimeUnit.MILLISECONDS));
-		return sezioni;
+		logger.debug("Response: " + pippo.toString());
+		return pippo;
 	}
-	
-	
-	@RequestMapping(value = "/mediaset/elenco-sezioni/{program_id}", method = RequestMethod.GET)
+
+	private Document crawl(String url) throws IOException {
+
+		Document doc;
+
+		Response response = Jsoup.connect(url).followRedirects(false).timeout(50000).execute();
+
+		if (response.hasHeader("location"))
+			doc = crawl(response.header("location"));
+		else
+			doc = Jsoup.connect(url).followRedirects(false).timeout(50000).get();
+
+		logger.debug("status code: " + response.statusCode() + " - url: " + url);
+
+		return doc;
+	}
+
+	private boolean checkNull(Object obj) {
+		return obj != null ? true : false;
+	}
+
+	@GetMapping(value = "/mediaset/elenco-sezioni/{program_id}")
 	public @ResponseBody Sections elencoSezioniGET(@PathVariable String program_id) throws IOException {
-		return lista_sezioni.get(program_id);
+		return sessionManagement.getCache_sezioni().get(program_id);
 	}
-	
-	@RequestMapping(value = "/mediaset/elenco-sezioni", method = RequestMethod.POST)
+
+	@PostMapping(value = "/mediaset/elenco-sezioni")
 	public @ResponseBody Collection<Section> elencoSezioniPOST(@RequestBody Input input) throws IOException {
-		
-		return programmi.get(input.getId()).getSections().values();
+
+		return sessionManagement.getProgrammi().get(input.getId()).getSections().values();
 	}
 
-
-	@RequestMapping(value = "/mediaset/elenco-video", method = RequestMethod.POST)
+	@PostMapping(value = "/mediaset/elenco-video")
 	public @ResponseBody List<Video> elencoVideoPOST(@RequestBody Input input) throws IOException {
 		logger.debug("Request: " + input);
-		List<Video> video = programmi.get(input.getProgramId()).getSections().get(input.getSector()).getVideos();	
+		List<Video> video = sessionManagement.getProgrammi().get(input.getProgramId()).getSections()
+				.get(input.getSector()).getVideos();
 		logger.debug("Response: " + video);
 		return video;
 
 	}
 
-	@RequestMapping(value = "/mediaset/video", method = RequestMethod.POST)
+	@PostMapping(value = "/mediaset/video")
 	public @ResponseBody Video videoPOST(@RequestBody Input input) throws IOException {
 
 		String video_url_json = "http://cdnsel01.mediaset.net/GetCdn.aspx?streamid={id}&format=json";
 		video_url_json = video_url_json.replace("{id}", input.getId());
 
 		String json = Jsoup.connect(video_url_json).get().text();
-
+		logger.debug("video json: " + json);
 		JSONObject jsono = new JSONObject(json);
 		String direct_video_url = "";
 		if (jsono.getString("state").equals("OK"))
@@ -268,10 +295,23 @@ public class MediasetController {
 		return video;
 	}
 
+	@GetMapping(value = "/mediaset/video/{id}")
+	public @ResponseBody Video videoGET(@PathVariable String id) throws IOException {
 
-	public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
-	    long diffInMillies = date2.getTime() - date1.getTime();
-	    return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+		String video_url_json = "http://cdnsel01.mediaset.net/GetCdn.aspx?streamid={id}&format=json";
+		video_url_json = video_url_json.replace("{id}", id);
+
+		String json = Jsoup.connect(video_url_json).get().text();
+		logger.debug("video json: " + json);
+		JSONObject jsono = new JSONObject(json);
+		String direct_video_url = "";
+		if (jsono.getString("state").equals("OK"))
+			direct_video_url = (String) jsono.getJSONArray("videoList").get(0);
+
+		Video video = new Video();
+		video.setUrl(direct_video_url);
+		logger.debug("Response: " + video);
+		return video;
 	}
-	
+
 }
