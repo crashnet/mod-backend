@@ -54,6 +54,7 @@ public class MediasetInit {
 					program.setId(program.getLabel());
 				if (program.getUrl().contains("http"))
 					program.setUrl(program.getUrl().replaceFirst("http://www.video.mediaset.it", ""));
+				program.setDescription("default description no cache");
 				sessionManagement.getProgrammi().put(program.getId(), program);
 			}
 		}

@@ -23,16 +23,26 @@ public class Program {
 	private String thumbnail;
 	// @JsonProperty("mc")
 	private String mc;
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	private String description;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-	
+
 	private Map<String, Section> sections;
 
-	public Map<String,Section> getSections() {
+	public Map<String, Section> getSections() {
 		return sections;
 	}
 
-	public void setSections(Map<String,Section> sections) {
+	public void setSections(Map<String, Section> sections) {
 		this.sections = sections;
 	}
 

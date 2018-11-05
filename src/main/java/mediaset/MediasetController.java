@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -38,13 +40,8 @@ public class MediasetController {
 	@Autowired
 	private SessionManagement sessionManagement;
 
-//	private Archivio archivio = session.getArchivio();
-//	private Map<String, Program> programmi = session.getProgrammi();
-//	private Map<String, Sections> cache_sezioni = session.getCache_sezioni();
 
-	public MediasetController() {
-
-	}
+	public MediasetController() {}
 
 	@GetMapping(value = "/mediaset/sizesezioni")
 	public @ResponseBody int sezioniSizeGET() throws IOException {
@@ -188,6 +185,10 @@ public class MediasetController {
 
 		Document doc = crawl(program_url);
 		logger.debug("doc: " + doc.textNodes());
+		
+		Element descr = doc.select("div._1bCA7").first();
+		logger.debug("Program description:" + descr.text());
+		
 		Elements secs = doc.select("section.videoMixed");
 		logger.debug("secs.size: " + secs.size());
 		ArrayList<Section> sections = new ArrayList<Section>();
@@ -235,6 +236,74 @@ public class MediasetController {
 		return pippo;
 	}
 
+	@GetMapping(value = "/mediaset/programma/{id}")
+	public @ResponseBody Program programmaGET(@PathVariable String id) throws IOException {
+
+		logger.debug("Request: " + id);
+		String path_url = sessionManagement.getProgrammi().get(id).getUrl();
+		logger.debug("path_url: " + path_url);
+		String program_url = "http://www.video.mediaset.it" + path_url;
+
+		Program program = sessionManagement.getProgrammi().get(id);
+		
+		Document doc = crawl(program_url);
+		logger.debug("doc: " + doc.textNodes());
+		
+		Element descr = doc.select("div._1bCA7").first();
+		logger.debug("Program description:" + descr.text());
+		
+		Elements secs = doc.select("section.videoMixed");
+		logger.debug("secs.size: " + secs.size());
+		Map<String, Section> sections = new HashMap<String, Section>();
+
+		for (Element sec : secs) {
+			Element tag_h2 = sec.select("h2").first();
+
+			if (checkNull(tag_h2)) {
+
+				Elements tags_a = sec.select("a");
+
+				List<Video> video_array = new ArrayList<Video>();
+				
+				program.setDescription(descr.text());
+				Section section = new Section();
+				section.setTitle(tag_h2.text());
+				section.setNumVideo(tags_a.size());
+
+				for (Element tag_a : tags_a) {
+
+					Video video = new Video();
+					String attr_href = tag_a.attr("href");
+					video.setId((attr_href.split("_").length > 1 ? attr_href.split("_")[1] : ""));
+
+					Element tag_img = tag_a.select("img").first();
+
+					if (checkNull(tag_img)) {
+						video.setThumbnails(tag_img.attr("src"));
+						video.setTitle(tag_img.attr("title"));
+					}
+					if (!video.getId().equals(""))
+						video_array.add(video);
+
+					logger.debug(video.toString());
+				}
+
+				section.setVideos(video_array);
+				sections.put(section.getTitle(),section);
+
+			}
+		}
+
+	//	Sections pippo = new Sections(sections, id, sessionManagement.getProgrammi().get(id).getLabel());
+		program.setSections(sections);
+		
+		Date timestamp_end = new Date();
+		logger.debug("Response: " + program.toString());
+		return program;
+	}
+
+	
+	
 	private Document crawl(String url) throws IOException {
 
 		Document doc;

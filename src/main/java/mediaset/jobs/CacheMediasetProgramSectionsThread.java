@@ -54,7 +54,7 @@ public class CacheMediasetProgramSectionsThread extends Thread {
 
 			lista_sezioni_future.add(future);
 
-//			if (i >= 10) break;
+//			if (i >= 100) break;
 		}
 
 		for (Future<Map<String, Section>> fut : lista_sezioni_future) {
