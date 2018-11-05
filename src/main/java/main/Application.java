@@ -19,8 +19,8 @@ public class Application {
 		SpringApplication.run(Application.class, args);
 		
 		RestTemplate rt = new RestTemplate();
-//		rt.getForObject("http://mediaset-api.herokuapp.com/prova", Void.class);
-		rt.getForObject("http://localhost:8080/prova", Void.class);
+		rt.getForObject("http://mediaset-api.herokuapp.com/prova", Void.class);
+//		rt.getForObject("http://localhost:8080/prova", Void.class);
 	}
 	
 	
