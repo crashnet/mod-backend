@@ -7,13 +7,22 @@ public class Section {
 
 	@Override
 	public String toString() {
-		return "Section [title=" + title + ", numVideo=" + numVideo + "]";
+		return "Section [title=" + title + ", numVideo=" + numVideo + ", videos=" + videos + ", id=" + id + "]";
 	}
 
 	private String title;
 	private int numVideo = 0;
 	private List<Video> videos;
+	private String id;
 	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public List<Video> getVideos() {
 		return videos;
 	}

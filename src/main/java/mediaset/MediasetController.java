@@ -40,8 +40,8 @@ public class MediasetController {
 	@Autowired
 	private SessionManagement sessionManagement;
 
-
-	public MediasetController() {}
+	public MediasetController() {
+	}
 
 	@GetMapping(value = "/mediaset/sizesezioni")
 	public @ResponseBody int sezioniSizeGET() throws IOException {
@@ -61,14 +61,16 @@ public class MediasetController {
 	}
 
 	@GetMapping(value = "/mediaset/elenco-gruppi")
-	public @ResponseBody List<Group> elencoGruppiGET() throws IOException {
-		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
-		List<String> groups = new ArrayList<String>();
-		for (Group g : gruppi) {
-			groups.add(g.getIndex());
+	public @ResponseBody List<Group> elencoGruppiGET() throws IOException, CloneNotSupportedException {
+
+		List<Group> groups = new ArrayList<Group>();
+
+		for (Group g : sessionManagement.getArchivio().getProgrammi().getGroup()) {
+			Group ng = new Group();
+			ng.setIndex(g.getIndex());
+			groups.add(ng);
 		}
-//		return groups;
-		return gruppi;
+		return groups;
 	}
 
 	@PostMapping(value = "/mediaset/elenco-gruppi")
@@ -185,10 +187,10 @@ public class MediasetController {
 
 		Document doc = crawl(program_url);
 		logger.debug("doc: " + doc.textNodes());
-		
+
 		Element descr = doc.select("div._1bCA7").first();
 		logger.debug("Program description:" + descr.text());
-		
+
 		Elements secs = doc.select("section.videoMixed");
 		logger.debug("secs.size: " + secs.size());
 		ArrayList<Section> sections = new ArrayList<Section>();
@@ -236,25 +238,29 @@ public class MediasetController {
 		return pippo;
 	}
 
+	/**
+	 * @param id
+	 * @return
+	 * @throws IOException
+	 */
 	@GetMapping(value = "/mediaset/programma/{id}")
 	public @ResponseBody Program programmaGET(@PathVariable String id) throws IOException {
 
 		logger.debug("Request: " + id);
-		String path_url = sessionManagement.getProgrammi().get(id).getUrl();
+		Program program = sessionManagement.getProgrammi().get(id);
+
+		String path_url = program.getUrl();
 		logger.debug("path_url: " + path_url);
 		String program_url = "http://www.video.mediaset.it" + path_url;
 
-		Program program = sessionManagement.getProgrammi().get(id);
-		
+		List<Section> sections = new ArrayList<Section>();
+
 		Document doc = crawl(program_url);
 		logger.debug("doc: " + doc.textNodes());
-		
-		Element descr = doc.select("div._1bCA7").first();
-		logger.debug("Program description:" + descr.text());
-		
+
+
 		Elements secs = doc.select("section.videoMixed");
 		logger.debug("secs.size: " + secs.size());
-		Map<String, Section> sections = new HashMap<String, Section>();
 
 		for (Element sec : secs) {
 			Element tag_h2 = sec.select("h2").first();
@@ -263,12 +269,12 @@ public class MediasetController {
 
 				Elements tags_a = sec.select("a");
 
-				List<Video> video_array = new ArrayList<Video>();
 				
-				program.setDescription(descr.text());
+
 				Section section = new Section();
+				
 				section.setTitle(tag_h2.text());
-				section.setNumVideo(tags_a.size());
+				List<Video> video_array = new ArrayList<Video>();
 
 				for (Element tag_a : tags_a) {
 
@@ -288,22 +294,25 @@ public class MediasetController {
 					logger.debug(video.toString());
 				}
 
+				section.setId(String.valueOf(secs.indexOf(sec)));
 				section.setVideos(video_array);
-				sections.put(section.getTitle(),section);
+				section.setNumVideo(video_array.size());
+				sections.add(section);
 
 			}
 		}
 
-	//	Sections pippo = new Sections(sections, id, sessionManagement.getProgrammi().get(id).getLabel());
+		Element descr = doc.select("div._1bCA7").first();
+		logger.debug("Program description:" + descr);
+
 		program.setSections(sections);
+		program.setDescription((descr != null) ? descr.text() : "description not found");
 		
-		Date timestamp_end = new Date();
+		
 		logger.debug("Response: " + program.toString());
 		return program;
 	}
 
-	
-	
 	private Document crawl(String url) throws IOException {
 
 		Document doc;
@@ -332,24 +341,22 @@ public class MediasetController {
 	@PostMapping(value = "/mediaset/elenco-sezioni")
 	public @ResponseBody Collection<Section> elencoSezioniPOST(@RequestBody Input input) throws IOException {
 
-		return sessionManagement.getProgrammi().get(input.getId()).getSections().values();
+		return sessionManagement.getProgrammi().get(input.getId()).getSections();
 	}
 
 	@PostMapping(value = "/mediaset/elenco-video")
 	public @ResponseBody List<Video> elencoVideoPOST(@RequestBody Input input) throws IOException {
 		logger.debug("Request: " + input);
-		List<Video> video = sessionManagement.getProgrammi().get(input.getProgramId()).getSections()
-				.get(input.getSector()).getVideos();
+		List<Video> video = sessionManagement.getProgrammi().get(input.getProgramId()).getSections().get(1).getVideos();
 		logger.debug("Response: " + video);
 		return video;
 
 	}
-	
+
 	@GetMapping(value = "/mediaset/elenco-video")
 	public @ResponseBody List<Video> elencoVideoGET(@RequestBody Input input) throws IOException {
 		logger.debug("Request: " + input);
-		List<Video> video = sessionManagement.getProgrammi().get(input.getProgramId()).getSections()
-				.get(input.getSector()).getVideos();
+		List<Video> video = sessionManagement.getProgrammi().get(input.getProgramId()).getSections().get(1).getVideos();
 		logger.debug("Response: " + video);
 		return video;
 

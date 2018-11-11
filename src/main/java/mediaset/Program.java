@@ -2,6 +2,7 @@
 package mediaset;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -10,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "label", "id", "url", "thumbnail", "mc" })
+@JsonPropertyOrder({ "label", "id", "url", "thumbnail", "mc", "description" })
 public class Program {
 
 	// @JsonProperty("label")
@@ -23,6 +24,13 @@ public class Program {
 	private String thumbnail;
 	// @JsonProperty("mc")
 	private String mc;
+	// @JsonProperty("description")
+	private String description;
+	
+	@JsonIgnore
+	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	
+	private List<Section> sections;
 
 	public String getDescription() {
 		return description;
@@ -32,17 +40,15 @@ public class Program {
 		this.description = description;
 	}
 
-	private String description;
-	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-	private Map<String, Section> sections;
 
-	public Map<String, Section> getSections() {
+
+
+	public List<Section> getSections() {
 		return sections;
 	}
 
-	public void setSections(Map<String, Section> sections) {
+	public void setSections(List<Section> sections) {
 		this.sections = sections;
 	}
 

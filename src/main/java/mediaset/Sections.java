@@ -1,10 +1,11 @@
 package mediaset;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Sections {
 
-	private ArrayList<Section> sections;
+	private List<Section> sections;
 	private String programId;
 	private String label;
 	
@@ -17,7 +18,7 @@ public class Sections {
 		super();
 	}
 	
-	public Sections(ArrayList<Section> sections, String programId, String label) {
+	public Sections(List<Section> sections, String programId, String label) {
 		super();
 		this.sections = sections;
 		this.programId = programId;
@@ -42,11 +43,11 @@ public class Sections {
 		this.programId = programId;
 	}
 
-	public ArrayList<Section> getSections() {
+	public List<Section> getSections() {
 		return sections;
 	}
 
-	public void setSections(ArrayList<Section> sections) {
+	public void setSections(List<Section> sections) {
 		this.sections = sections;
 	}
 

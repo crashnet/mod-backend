@@ -54,19 +54,10 @@ public class CacheMediasetProgramSectionsThread extends Thread {
 
 			lista_sezioni_future.add(future);
 
-//			if (i >= 100) break;
+			if (i >= 1) break;
 		}
 
 		for (Future<Map<String, Section>> fut : lista_sezioni_future) {
-			try {
-				logger.debug((new Date() + "::" + this.getName() + "::" + fut.get()));
-//				Sections p = new Sections();
-//				cache_sezioni.put(program.getId(), p);
-					} catch (InterruptedException | ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
 			logger.info("CacheSectionsThread end futures");
 
 		}

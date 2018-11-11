@@ -40,6 +40,12 @@ public class Group {
 		this.index = index;
 	}
 
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
+	}
+
 	public Group withIndex(String index) {
 		this.index = index;
 		return this;
