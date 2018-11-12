@@ -248,8 +248,10 @@ public class MediasetController {
 
 		logger.debug("Request: " + id);
 		Program program = sessionManagement.getProgrammi().get(id);
-		
-		if(program.getSections()!=null) return program;
+		if(checkNull(program))
+			if(checkNull(program.getSections()))
+				return program;
+
 
 		String path_url = program.getUrl();
 		logger.debug("path_url: " + path_url);
@@ -306,10 +308,12 @@ public class MediasetController {
 
 		Element descr = doc.select("div._1bCA7").first();
 		logger.debug("Program description:" + descr);
-
-		program.setSections(sections);
 		program.setDescription((descr != null) ? descr.text() : "description not found");
 		
+		Element poster = doc.select("img._2BHAN").first();		
+		program.setPoster((poster != null) ? poster.attr("src") : null);
+		
+		program.setSections(sections);
 		
 		logger.debug("Response: " + program.toString());
 		return program;

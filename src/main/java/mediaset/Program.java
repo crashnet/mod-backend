@@ -26,6 +26,8 @@ public class Program {
 	private String mc;
 	// @JsonProperty("description")
 	private String description;
+	// @JsonProperty("poster")
+	private String poster;
 	
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -40,9 +42,14 @@ public class Program {
 		this.description = description;
 	}
 
+	
+	public String getPoster() {
+		return poster;
+	}
 
-
-
+	public void setPoster(String poster) {
+		this.poster = poster;
+	}
 
 	public List<Section> getSections() {
 		return sections;
@@ -75,7 +82,8 @@ public class Program {
 	@Override
 	public String toString() {
 		return "Program [label=" + label + ", id=" + id + ", url=" + url + ", thumbnail=" + thumbnail + ", mc=" + mc
-				+ ", additionalProperties=" + additionalProperties + "]";
+				+ ", description=" + description + ", poster=" + poster + ", additionalProperties="
+				+ additionalProperties + ", sections=" + sections + "]";
 	}
 
 	// @JsonProperty("id")
