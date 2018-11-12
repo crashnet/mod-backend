@@ -29,7 +29,7 @@ public class CacheMediasetProgramSectionsThread extends Thread {
 	final static Logger logger = Logger.getLogger(CacheMediasetProgramSectionsThread.class);
 
 
-	private List<Future<Map<String, Section>>> lista_sezioni_future = new ArrayList<Future<Map<String, Section>>>();
+	private List<Future<List<Section>>> lista_sezioni_future = new ArrayList<Future<List<Section>>>();
 
 
 	public CacheMediasetProgramSectionsThread(SessionManagement sessionManagement) {
@@ -48,16 +48,16 @@ public class CacheMediasetProgramSectionsThread extends Thread {
 		for (String key : keys) {
 			program = sessionManagement.getProgrammi().get(key);
 			i++;
-			Callable<Map<String, Section>> callable = new MyCallableSections(program);
+			Callable<List<Section>> callable = new MyCallableSections(program);
 
-			Future<Map<String, Section>> future = executor.submit(callable);
+			Future<List<Section>> future = executor.submit(callable);
 
 			lista_sezioni_future.add(future);
 
-			if (i >= 1) break;
+//			if (i >= 1) break;
 		}
 
-		for (Future<Map<String, Section>> fut : lista_sezioni_future) {
+		for (Future<List<Section>> fut : lista_sezioni_future) {
 			logger.info("CacheSectionsThread end futures");
 
 		}

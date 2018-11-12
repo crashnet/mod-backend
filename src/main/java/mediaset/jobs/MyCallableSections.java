@@ -19,22 +19,21 @@ import mediaset.Program;
 import mediaset.Section;
 import mediaset.Video;
 
-public class MyCallableSections implements Callable<Map<String, Section>> {
+public class MyCallableSections implements Callable< List<Section>> {
 
 	final static Logger logger = Logger.getLogger(MyCallableSections.class);
 
 	private Program program;
 	private String program_url;
 	private Document doc;
-	private Map<String, Section> sections = new HashMap<String, Section>();
-	private List<Section> sezioni = new ArrayList<Section>();
+	private List<Section> sections = new ArrayList<Section>();
 
 	MyCallableSections(Program program) {
 		this.program = program;
 	}
 
 	@Override
-	public Map<String, Section> call() {
+	public List<Section> call() {
 
 		if(program.getUrl().equals(""))
 			return null;
@@ -81,13 +80,11 @@ public class MyCallableSections implements Callable<Map<String, Section>> {
 				}
 
 				s.setVideos(video_array);
-				sections.put(s.getTitle(), s);
-				sezioni.add(s);
+				sections.add(s);
 			}
 		}
 
-		program.setSections(sezioni);
-//		program.setSezioni(sezioni);
+		program.setSections(sections);
 		Element descr = doc.select("div._1bCA7").first();
 		if(checkNull(descr)) {
 			program.setDescription(descr.text());				

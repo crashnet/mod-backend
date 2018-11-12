@@ -248,6 +248,8 @@ public class MediasetController {
 
 		logger.debug("Request: " + id);
 		Program program = sessionManagement.getProgrammi().get(id);
+		
+		if(program.getSections()!=null) return program;
 
 		String path_url = program.getUrl();
 		logger.debug("path_url: " + path_url);
