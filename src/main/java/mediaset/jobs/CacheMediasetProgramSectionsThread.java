@@ -39,7 +39,7 @@ public class CacheMediasetProgramSectionsThread extends Thread {
 	public void run() {
 		logger.info("CacheSectionsThread start");
 
-		ExecutorService executor = Executors.newFixedThreadPool(1);
+		ExecutorService executor = Executors.newFixedThreadPool(10);
 
 		logger.info("CacheSectionsThread running ...");
 		Set<String> keys = sessionManagement.getProgrammi().keySet();

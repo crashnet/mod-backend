@@ -87,7 +87,7 @@ public class MyCallableSections implements Callable< List<Section>> {
 		program.setSections(sections);
 
 		Element descr = doc.select("div._1bCA7").first();
-//		logger.debug("Program description:" + descr);
+		logger.info("Program description:" + descr);
 		program.setDescription((descr != null) ? descr.text() : "description not found");
 		
 		return sections;

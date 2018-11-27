@@ -405,5 +405,16 @@ public class MediasetController {
 		logger.debug("Response: " + video);
 		return video;
 	}
+	
+	@GetMapping(value = "/mediaset/getmenu")
+	public @ResponseBody List getMenu() throws IOException {
+
+		List<MenuItem> list = new ArrayList<MenuItem>();
+		list.add(new MenuItem("Offerta per Te", "https://wwww.google.it" ));
+		list.add(new MenuItem("Porta i tuoi Amici", "https://wwww.google.it"));
+		list.add(new MenuItem("Your next Market", "https://wwww.google.it"));
+
+		return list;
+	}
 
 }
