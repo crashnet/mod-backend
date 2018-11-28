@@ -273,10 +273,7 @@ public class MediasetController {
 
 				Elements tags_a = sec.select("a");
 
-				
-
 				Section section = new Section();
-				
 				section.setTitle(tag_h2.text());
 				List<Video> video_array = new ArrayList<Video>();
 
@@ -310,7 +307,8 @@ public class MediasetController {
 		logger.debug("Program description:" + descr);
 		program.setDescription((descr != null) ? descr.text() : "description not found");
 		
-		Element poster = doc.select("img._2BHAN").first();		
+		Element poster = doc.select("img._2BHAN").first();
+		logger.debug("Program poster:" + poster);
 		program.setPoster((poster != null) ? poster.attr("src") : null);
 		
 		program.setSections(sections);
