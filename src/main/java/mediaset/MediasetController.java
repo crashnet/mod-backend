@@ -417,7 +417,7 @@ public class MediasetController {
 		return list;
 	}
 	
-	@GetMapping(value = "/mediaset/searchByTitle")
+	@GetMapping(value = "/mediaset/searchByTitle/{search}")
 	public @ResponseBody List<Program> getProgramList(@PathVariable String search) throws IOException {
 
 		List<Program> list = new ArrayList<Program>();
