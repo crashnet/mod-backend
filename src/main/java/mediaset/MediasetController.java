@@ -417,6 +417,20 @@ public class MediasetController {
 		return list;
 	}
 	
+	@GetMapping(value = "/mediaset/searchByTitleLigth/{search}")
+	public @ResponseBody List<ProgramLigth> getProgramListLight(@PathVariable String search) throws IOException {
+
+		List<ProgramLigth> list = new ArrayList<ProgramLigth>();
+
+		for(Program prog: sessionManagement.getProgrammi().values())
+			if(prog.getLabel().toUpperCase().contains(search.toUpperCase())) {
+				
+				list.add(new ProgramLigth(prog.getId(), prog.getLabel()));
+			}
+
+		return list;
+	}
+	
 	@GetMapping(value = "/mediaset/searchByTitle/{search}")
 	public @ResponseBody List<Program> getProgramList(@PathVariable String search) throws IOException {
 
