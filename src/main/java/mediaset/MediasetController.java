@@ -44,8 +44,14 @@ public class MediasetController {
 	}
 
 	@GetMapping(value = "/mediaset/sizesezioni")
-	public @ResponseBody int sezioniSizeGET() throws IOException {
-		return sessionManagement.getCache_sezioni().size();
+	public @ResponseBody int sezioniSizeGET() {
+		int sectionSize = 0;
+		for(Program p: sessionManagement.getProgrammi().values())  {
+			if(checkNull(p.getSections()))
+				sectionSize += p.getSections().size();
+		}
+		
+		return sectionSize;
 	}
 
 	@RequestMapping(value = "/mediaset/archivio", method = RequestMethod.GET)
@@ -85,8 +91,9 @@ public class MediasetController {
 
 	@GetMapping(value = "/mediaset/elenco-programmi/{id}")
 	public @ResponseBody List<Program> elencoProgrammiPerGruppoGET(@PathVariable String id) throws IOException {
-		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
-
+//		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
+		Map<String, Program> map = sessionManagement.getProgrammi();
+		
 		for (Group g : gruppi)
 			if (id.equals(g.getIndex()))
 				return g.getProgram();
@@ -251,7 +258,6 @@ public class MediasetController {
 		if(checkNull(program))
 			if(checkNull(program.getSections()))
 				return program;
-
 
 		String path_url = program.getUrl();
 		logger.debug("path_url: " + path_url);
