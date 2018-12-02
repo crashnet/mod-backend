@@ -91,9 +91,8 @@ public class MediasetController {
 
 	@GetMapping(value = "/mediaset/elenco-programmi/{id}")
 	public @ResponseBody List<Program> elencoProgrammiPerGruppoGET(@PathVariable String id) throws IOException {
-//		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
-		Map<String, Program> map = sessionManagement.getProgrammi();
-		
+		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
+
 		for (Group g : gruppi)
 			if (id.equals(g.getIndex()))
 				return g.getProgram();
