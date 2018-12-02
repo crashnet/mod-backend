@@ -28,7 +28,19 @@ public class Program {
 	private String description;
 	// @JsonProperty("poster")
 	private String poster;
+	// @JsonProperty("group")
+	private String group;
 	
+	
+	
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 	
@@ -82,7 +94,7 @@ public class Program {
 	@Override
 	public String toString() {
 		return "Program [label=" + label + ", id=" + id + ", url=" + url + ", thumbnail=" + thumbnail + ", mc=" + mc
-				+ ", description=" + description + ", poster=" + poster + ", additionalProperties="
+				+ ", description=" + description + ", poster=" + poster + ", group=" + group + ", additionalProperties="
 				+ additionalProperties + ", sections=" + sections + "]";
 	}
 

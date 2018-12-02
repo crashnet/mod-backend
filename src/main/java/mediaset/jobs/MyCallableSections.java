@@ -15,11 +15,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import configuration.SessionManagement;
 import mediaset.Program;
 import mediaset.Section;
 import mediaset.Video;
 
-public class MyCallableSections implements Callable< List<Section>> {
+public class MyCallableSections implements Callable<Program> {
 
 	final static Logger logger = Logger.getLogger(MyCallableSections.class);
 
@@ -33,7 +34,7 @@ public class MyCallableSections implements Callable< List<Section>> {
 	}
 
 	@Override
-	public List<Section> call() {
+	public Program call() {
 
 		if(program.getUrl().equals(""))
 			return null;
@@ -94,7 +95,8 @@ public class MyCallableSections implements Callable< List<Section>> {
 		logger.info("Program poster:" + poster);
 		program.setPoster((poster != null) ? poster.attr("src") : null);
 
-		return sections;
+		
+		return program;
 	}
 
 	private void crawl(String url) {

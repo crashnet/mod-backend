@@ -2,6 +2,9 @@ package mediaset;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -13,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import configuration.SessionManagement;
+import jdk.internal.org.objectweb.asm.util.CheckAnnotationAdapter;
 import mediaset.jobs.CacheMediasetProgramSectionsThread;
 
 @RestController
@@ -49,6 +53,7 @@ public class MediasetInit {
 
 		/** popolo la mappa di tutti i programmi **/
 		for (Group group : sessionManagement.getArchivio().getProgrammi().getGroup()) {
+			
 			for (Program program : group.getProgram()) {
 				if (program.getId().equals(""))
 					program.setId(program.getLabel());
@@ -58,6 +63,7 @@ public class MediasetInit {
 				sessionManagement.getProgrammi().put(program.getId(), program);
 			}
 		}
+		
 
 		CacheMediasetProgramSectionsThread cst = new CacheMediasetProgramSectionsThread(sessionManagement);
 		cst.start();

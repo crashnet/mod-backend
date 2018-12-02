@@ -46,11 +46,11 @@ public class MediasetController {
 	@GetMapping(value = "/mediaset/sizesezioni")
 	public @ResponseBody int sezioniSizeGET() {
 		int sectionSize = 0;
-		for(Program p: sessionManagement.getProgrammi().values())  {
-			if(checkNull(p.getSections()))
+		for (Program p : sessionManagement.getProgrammi().values()) {
+			if (checkNull(p.getSections()))
 				sectionSize += p.getSections().size();
 		}
-		
+
 		return sectionSize;
 	}
 
@@ -91,13 +91,24 @@ public class MediasetController {
 
 	@GetMapping(value = "/mediaset/elenco-programmi/{id}")
 	public @ResponseBody List<Program> elencoProgrammiPerGruppoGET(@PathVariable String id) throws IOException {
+//		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
+
+//		for (Group g : gruppi)
+//			if (id.equals(g.getIndex()))
+//				return g.getProgram();
+//
+//		return null;
+
+		List<Program> lista_programmi = new ArrayList<Program>();
 		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
 
 		for (Group g : gruppi)
 			if (id.equals(g.getIndex()))
-				return g.getProgram();
+				for (Program p : g.getProgram())
+					lista_programmi.add(sessionManagement.getProgrammi().get(p.getId()));
 
-		return null;
+		return lista_programmi;
+
 	}
 
 	@PostMapping(value = "/mediaset/elenco-programmi")
@@ -254,8 +265,8 @@ public class MediasetController {
 
 		logger.debug("Request: " + id);
 		Program program = sessionManagement.getProgrammi().get(id);
-		if(checkNull(program))
-			if(checkNull(program.getSections()))
+		if (checkNull(program))
+			if (checkNull(program.getSections()))
 				return program;
 
 		String path_url = program.getUrl();
@@ -266,7 +277,6 @@ public class MediasetController {
 
 		Document doc = crawl(program_url);
 		logger.debug("doc: " + doc.textNodes());
-
 
 		Elements secs = doc.select("section.videoMixed");
 		logger.debug("secs.size: " + secs.size());
@@ -311,13 +321,13 @@ public class MediasetController {
 		Element descr = doc.select("div._1bCA7").first();
 		logger.debug("Program description:" + descr);
 		program.setDescription((descr != null) ? descr.text() : "description not found");
-		
+
 		Element poster = doc.select("img._2BHAN").first();
 		logger.debug("Program poster:" + poster);
 		program.setPoster((poster != null) ? poster.attr("src") : null);
-		
+
 		program.setSections(sections);
-		
+
 		logger.debug("Response: " + program.toString());
 		return program;
 	}
@@ -408,39 +418,39 @@ public class MediasetController {
 		logger.debug("Response: " + video);
 		return video;
 	}
-	
+
 	@GetMapping(value = "/mediaset/getmenu")
 	public @ResponseBody List getMenu() throws IOException {
 
 		List<MenuItem> list = new ArrayList<MenuItem>();
-		list.add(new MenuItem("Offerta per Te", "https://wwww.google.it" ));
+		list.add(new MenuItem("Offerta per Te", "https://wwww.google.it"));
 		list.add(new MenuItem("Porta i tuoi Amici", "https://wwww.google.it"));
 		list.add(new MenuItem("Your next Market", "https://wwww.google.it"));
 
 		return list;
 	}
-	
+
 	@GetMapping(value = "/mediaset/searchByTitleLigth/{search}")
 	public @ResponseBody List<ProgramLigth> getProgramListLight(@PathVariable String search) throws IOException {
 
 		List<ProgramLigth> list = new ArrayList<ProgramLigth>();
 
-		for(Program prog: sessionManagement.getProgrammi().values())
-			if(prog.getLabel().toUpperCase().contains(search.toUpperCase())) {
-				
+		for (Program prog : sessionManagement.getProgrammi().values())
+			if (prog.getLabel().toUpperCase().contains(search.toUpperCase())) {
+
 				list.add(new ProgramLigth(prog.getId(), prog.getLabel()));
 			}
 
 		return list;
 	}
-	
+
 	@GetMapping(value = "/mediaset/searchByTitle/{search}")
 	public @ResponseBody List<Program> getProgramList(@PathVariable String search) throws IOException {
 
 		List<Program> list = new ArrayList<Program>();
 
-		for(Program prog: sessionManagement.getProgrammi().values())
-			if(prog.getLabel().toUpperCase().contains(search.toUpperCase()))
+		for (Program prog : sessionManagement.getProgrammi().values())
+			if (prog.getLabel().toUpperCase().contains(search.toUpperCase()))
 				list.add(prog);
 
 		return list;
