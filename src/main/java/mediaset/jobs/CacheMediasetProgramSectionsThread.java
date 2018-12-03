@@ -62,14 +62,6 @@ public class CacheMediasetProgramSectionsThread extends Thread {
 			for (Group g : list_groups) {
 				List<Program> pr_list = g.getProgram();
 				for (Program p : pr_list) {
-					try {
-						if(p.getId().equals(fut.get().getId())) {
-							p = fut.get();
-						}
-					} catch (InterruptedException | ExecutionException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 				}
 			}
 

@@ -111,6 +111,25 @@ public class MediasetController {
 
 	}
 
+	@GetMapping(value = "/mediaset/elenco-programmi-light/{id}")
+	public @ResponseBody List<ProgramLight> elencoProgrammiPerGruppoLightGET(@PathVariable String id) throws IOException {
+//		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
+
+		List<ProgramLight> lista_programmi = new ArrayList<ProgramLight>();
+		List<Group> gruppi = sessionManagement.getArchivio().getProgrammi().getGroup();
+
+		for (Group g : gruppi)
+			if (id.equals(g.getIndex()))
+				for (Program p : g.getProgram()) {
+					Program pi = sessionManagement.getProgrammi().get(p.getId());
+					
+					lista_programmi.add(new ProgramLight(pi.getId(), pi.getLabel(), pi.getThumbnail(), pi.getDescription()));
+				}
+		return lista_programmi;
+
+	}
+
+	
 	@PostMapping(value = "/mediaset/elenco-programmi")
 	public @ResponseBody List<Program> elencoProgrammiPerGruppoPOST(@RequestBody Input input) throws IOException {
 
@@ -431,14 +450,14 @@ public class MediasetController {
 	}
 
 	@GetMapping(value = "/mediaset/searchByTitleLigth/{search}")
-	public @ResponseBody List<ProgramLigth> getProgramListLight(@PathVariable String search) throws IOException {
+	public @ResponseBody List<ProgramLight> getProgramListLight(@PathVariable String search) throws IOException {
 
-		List<ProgramLigth> list = new ArrayList<ProgramLigth>();
+		List<ProgramLight> list = new ArrayList<ProgramLight>();
 
 		for (Program prog : sessionManagement.getProgrammi().values())
 			if (prog.getLabel().toUpperCase().contains(search.toUpperCase())) {
 
-				list.add(new ProgramLigth(prog.getId(), prog.getLabel()));
+				list.add(new ProgramLight(prog.getId(), prog.getLabel()));
 			}
 
 		return list;
