@@ -339,7 +339,7 @@ public class MediasetController {
 
 		Element descr = doc.select("div._1bCA7").first();
 		logger.debug("Program description:" + descr);
-		program.setDescription((descr != null) ? descr.text() : "description not found");
+		program.setDescription((descr != null) ? descr.text().replaceAll("&#160;", " ") : "description not found");
 
 		Element poster = doc.select("img._2BHAN").first();
 		logger.debug("Program poster:" + poster);

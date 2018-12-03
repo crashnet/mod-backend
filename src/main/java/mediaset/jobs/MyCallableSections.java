@@ -89,7 +89,7 @@ public class MyCallableSections implements Callable<Program> {
 
 		Element descr = doc.select("div._1bCA7").first();
 		logger.info("Program description:" + descr);
-		program.setDescription((descr != null) ? descr.text() : "description not found");
+		program.setDescription((descr != null) ? descr.text().replaceAll("&#160;", " ") : "description not found");
 
 		Element poster = doc.select("img._2BHAN").first();
 		logger.info("Program poster:" + poster);
