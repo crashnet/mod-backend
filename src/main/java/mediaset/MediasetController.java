@@ -438,16 +438,6 @@ public class MediasetController {
 		return video;
 	}
 
-	@GetMapping(value = "/mediaset/getmenu")
-	public @ResponseBody List getMenu() throws IOException {
-
-		List<MenuItem> list = new ArrayList<MenuItem>();
-		list.add(new MenuItem("Offerta per Te", "https://wwww.google.it"));
-		list.add(new MenuItem("Porta i tuoi Amici", "https://wwww.google.it"));
-		list.add(new MenuItem("Your next Market", "https://wwww.google.it"));
-
-		return list;
-	}
 
 	@GetMapping(value = "/mediaset/searchByTitleLigth/{search}")
 	public @ResponseBody List<ProgramLight> getProgramListLight(@PathVariable String search) throws IOException {
@@ -455,11 +445,9 @@ public class MediasetController {
 		List<ProgramLight> list = new ArrayList<ProgramLight>();
 
 		for (Program prog : sessionManagement.getProgrammi().values())
-			if (prog.getLabel().toUpperCase().contains(search.toUpperCase())) {
-
-				list.add(new ProgramLight(prog.getId(), prog.getLabel()));
-			}
-
+			if (prog.getLabel().toUpperCase().contains(search.toUpperCase()))
+				list.add(new ProgramLight(prog.getId(), prog.getLabel(),prog.getThumbnail(), prog.getDescription()));
+				
 		return list;
 	}
 
