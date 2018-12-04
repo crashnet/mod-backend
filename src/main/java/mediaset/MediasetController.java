@@ -450,6 +450,11 @@ public class MediasetController {
 				
 		return list;
 	}
+	
+	@GetMapping(value = "/mediaset/searchByTitleLigth")
+	public @ResponseBody List<ProgramLight> getProgramListLightDefault(@PathVariable String search) throws IOException {
+		return new ArrayList<ProgramLight>();
+	}
 
 	@GetMapping(value = "/mediaset/searchByTitle/{search}")
 	public @ResponseBody List<Program> getProgramList(@PathVariable String search) throws IOException {
