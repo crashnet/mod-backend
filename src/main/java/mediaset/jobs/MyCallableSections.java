@@ -44,8 +44,7 @@ public class MyCallableSections implements Callable<Program> {
 				+ program_url);
 
 		String url = crawl(program_url);
-		if(checkNull(url))
-			program.setUrl(url);
+		program.setUrl(url);
 		
 		Elements secs = doc.select("section.videoMixed");
 
