@@ -15,10 +15,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import configuration.SessionManagement;
-import mediaset.Group;
-import mediaset.Program;
-import mediaset.Section;
+import mediaset.beans.Group;
+import mediaset.beans.Program;
+import mediaset.beans.Section;
+import mediaset.configuration.SessionManagement;
 
 @Component
 public class CacheMediasetProgramSectionsThread extends Thread {

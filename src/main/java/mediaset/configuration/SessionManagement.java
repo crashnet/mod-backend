@@ -1,13 +1,13 @@
-package configuration;
+package mediaset.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import mediaset.Archivio;
-import mediaset.Program;
-import mediaset.Sections;
+import mediaset.beans.Archivio;
+import mediaset.beans.Program;
+import mediaset.beans.Sections;
 
 @Component
 public class SessionManagement {

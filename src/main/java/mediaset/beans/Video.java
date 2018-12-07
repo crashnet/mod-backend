@@ -1,4 +1,4 @@
-package mediaset;
+package mediaset.beans;
 
 import java.util.ArrayList;
 

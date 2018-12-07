@@ -15,10 +15,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import configuration.SessionManagement;
-import mediaset.Program;
-import mediaset.Section;
-import mediaset.Video;
+import mediaset.beans.Program;
+import mediaset.beans.Section;
+import mediaset.beans.Video;
+import mediaset.configuration.SessionManagement;
 
 public class MyCallableSections implements Callable<Program> {
 
@@ -43,7 +43,9 @@ public class MyCallableSections implements Callable<Program> {
 		logger.debug("ProgramId: " + program.getId() + " - program_title: " + program.getLabel() + " - program_url: "
 				+ program_url);
 
-		crawl(program_url);
+		String url = crawl(program_url);
+		if(checkNull(url))
+			program.setUrl(url);
 		
 		Elements secs = doc.select("section.videoMixed");
 
@@ -99,16 +101,17 @@ public class MyCallableSections implements Callable<Program> {
 		return program;
 	}
 
-	private void crawl(String url) {
+	@SuppressWarnings("finally")
+	private String crawl(String url) {
 
 		Response response = null;
 		Connection con = null;
 		try {
 			con =Jsoup.connect(url);
 			response = con.followRedirects(false).timeout(100000).userAgent("Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36").execute();
-
+		
 		if (response.hasHeader("location"))
-			crawl(response.header("location"));
+			url = crawl(response.header("location"));
 		else
 			doc = Jsoup.connect(url).followRedirects(false).timeout(100000).userAgent("Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36").get();
 
@@ -118,6 +121,9 @@ public class MyCallableSections implements Callable<Program> {
 		} catch (IOException e) {
 			logger.error("ProgramId: " + program.getId() + " error code: "+ e.getMessage() +" status code: " + response.statusCode() + " program_title: "
 					+ program.getLabel() + " - url: " + url);
+		}
+		finally {
+			return url;
 		}
 	}
 

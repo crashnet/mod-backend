@@ -1,6 +1,9 @@
-package mediaset;
 
+package mediaset.beans;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -10,43 +13,32 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "programmi" })
-public class Archivio {
+@JsonPropertyOrder({ "group" })
+public class Programmi {
 
-	@JsonProperty("programmi")
-	private Programmi programmi;
+	@JsonProperty("group")
+	private List<Group> group = new ArrayList<Group>();
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+	@JsonProperty("group")
+	public List<Group> getGroup() {
+		return group;
+	}
+
+	@JsonProperty("group")
+	public void setGroup(List<Group> group) {
+		this.group = group;
+	}
+
+	public Programmi withGroup(List<Group> group) {
+		this.group = group;
+		return this;
+	}
+
 	@Override
 	public String toString() {
-		return "Example [programmi=" + programmi + ", additionalProperties=" + additionalProperties + "]";
-	}
-
-	/**
-	 * No args constructor for use in serialization
-	 * 
-	 */
-	public Archivio() {
-	}
-
-	/**
-	 * 
-	 * @param programmi
-	 */
-	public Archivio(Programmi programmi) {
-		super();
-		this.programmi = programmi;
-	}
-
-	@JsonProperty("programmi")
-	public Programmi getProgrammi() {
-		return programmi;
-	}
-
-	@JsonProperty("programmi")
-	public void setProgrammi(Programmi programmi) {
-		this.programmi = programmi;
+		return "Programmi [group=" + group + ", additionalProperties=" + additionalProperties + "]";
 	}
 
 	@JsonAnyGetter
@@ -57,6 +49,11 @@ public class Archivio {
 	@JsonAnySetter
 	public void setAdditionalProperty(String name, Object value) {
 		this.additionalProperties.put(name, value);
+	}
+
+	public Programmi withAdditionalProperty(String name, Object value) {
+		this.additionalProperties.put(name, value);
+		return this;
 	}
 
 }

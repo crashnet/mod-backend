@@ -1,4 +1,4 @@
-package configuration;
+package mediaset.configuration;
 
 import org.springframework.context.annotation.Configuration;
 

@@ -1,4 +1,4 @@
-package mediaset;
+package mediaset.beans;
 
 public class ProgramLight {
 
@@ -6,7 +6,16 @@ public class ProgramLight {
 	private String label;
 	private String description;
 	private String thumbnail;
+	private String url;
 	
+	
+	
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
 	public String getThumbnail() {
 		return thumbnail;
 	}
@@ -44,19 +53,20 @@ public class ProgramLight {
 		this.description = description;
 	}
 
-	public ProgramLight(String id, String label,String thumbnail, String description) {
+	public ProgramLight(String id, String label,String thumbnail, String description, String url) {
 		super();
 		this.id = id;
 		this.label = label;
 		this.thumbnail = thumbnail;
 		this.description = description;
+		this.url = url;
 		
 	}
 
 	@Override
 	public String toString() {
 		return "ProgramLight [id=" + id + ", label=" + label + ", description=" + description + ", thumbnail="
-				+ thumbnail + "]";
+				+ thumbnail + ", url=" + url + "]";
 	}
 
 }

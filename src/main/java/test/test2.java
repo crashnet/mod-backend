@@ -12,8 +12,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import mediaset.Section;
-import mediaset.Video;
+import mediaset.beans.Section;
+import mediaset.beans.Video;
 
 public class test2 {
 

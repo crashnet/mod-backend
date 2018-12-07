@@ -5,8 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
 
-import configuration.ConfigurationInfo;
 import mediaset.MediasetController;
+import mediaset.configuration.ConfigurationInfo;
 import mediaset.jobs.CacheMediasetProgramSectionsThread;
 
 @SpringBootApplication
@@ -19,7 +19,7 @@ public class Application {
 		SpringApplication.run(Application.class, args);
 		
 		RestTemplate rt = new RestTemplate();
-		rt.getForObject("http://mediaset-api.herokuapp.com/prova", Void.class);
+//		rt.getForObject("http://mediaset-api.herokuapp.com/prova", Void.class);
 		rt.getForObject("http://localhost:8080/prova", Void.class);
 	}
 
