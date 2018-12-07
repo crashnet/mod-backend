@@ -114,7 +114,7 @@ public class MediasetController {
 				for (Program p : g.getProgram()) {
 					Program pi = sessionManagement.getProgrammi().get(p.getId());
 					
-					lista_programmi.add(new ProgramLight(pi.getId(), pi.getLabel(), pi.getThumbnail(), pi.getDescription()));
+					lista_programmi.add(new ProgramLight(pi.getId(), pi.getLabel(), pi.getThumbnail(), pi.getDescription(), pi.getUrl()));
 				}
 		return lista_programmi;
 
@@ -267,7 +267,7 @@ public class MediasetController {
 
 		for (Program prog : sessionManagement.getProgrammi().values())
 			if (prog.getLabel().toUpperCase().contains(search.toUpperCase()))
-				list.add(new ProgramLight(prog.getId(), prog.getLabel(),prog.getThumbnail(), prog.getDescription()));
+				list.add(new ProgramLight(prog.getId(), prog.getLabel(),prog.getThumbnail(), prog.getDescription(), prog.getUrl()));
 				
 		return list;
 	}
