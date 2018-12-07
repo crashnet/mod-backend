@@ -113,8 +113,8 @@ public class MediasetController {
 			if (id.equals(g.getIndex()))
 				for (Program p : g.getProgram()) {
 					Program pi = sessionManagement.getProgrammi().get(p.getId());
-					
-					lista_programmi.add(new ProgramLight(pi.getId(), pi.getLabel(), pi.getThumbnail(), pi.getDescription(), pi.getUrl()));
+					if(!pi.getUrl().equals("https;//www.mediasetplay.mediaset.it"))
+						lista_programmi.add(new ProgramLight(pi.getId(), pi.getLabel(), pi.getThumbnail(), pi.getDescription(), pi.getUrl()));
 				}
 		return lista_programmi;
 
