@@ -71,7 +71,9 @@ public class MyCallableSections implements Callable<Program> {
 
 					if (checkNull(tag_img)) {
 						video.setThumbnails(tag_img.attr("src"));
-						video.setTitle(tag_img.attr("title"));
+//						video.setTitle(tag_img.attr("title"));
+						video.setTitle(Jsoup.parse(tag_img.attr("title")).text());
+						
 					}
 
 					if (!video.getId().equals("")) {
@@ -90,13 +92,16 @@ public class MyCallableSections implements Callable<Program> {
 
 		Element descr = doc.select("div._1bCA7").first();
 		logger.info("Program description:" + descr);
-		program.setDescription((descr != null) ? descr.text().replaceAll("&#160;", " ") : "description not found");
+		
+		
+//		program.setDescription((descr != null) ? descr.text().replaceAll("&#160;", " ") : "description not found");
+		program.setDescription((descr != null) ?  Jsoup.parse(descr.text()).text() : "description not found");
 
 		Element poster = doc.select("img._2BHAN").first();
 		logger.info("Program poster:" + poster);
 		program.setPoster((poster != null) ? poster.attr("src") : null);
 
-		
+		program.setLabel(Jsoup.parse(program.getLabel()).text());
 		return program;
 	}
 
